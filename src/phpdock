@@ -1,0 +1,170 @@
+#!/usr/bin/env bash
+
+COMPOSE='docker-compose --env-file ./.env.phpdock'
+
+# Is the environment running
+PSRESULT="$(docker-compose ps -q)"
+if [ ! -z "$PSRESULT" ]; then
+    EXEC="yes"
+else
+    EXEC="no"
+fi
+
+if [ "$1" == "build" ]; then
+
+    $COMPOSE build --no-cache --force-rm
+
+# Start up containers
+elif [ "$1" == "up" ]; then
+    echo "phpdock starting containers"
+    $COMPOSE up -d
+
+# Stop the containers
+elif [ "$1" == "down" ]; then
+    echo "phpdock stopping containers"
+    $COMPOSE down --remove-orphans
+
+# Destroy the containers
+elif [ "$1" == "kill" ]; then
+    ./phpdock down
+    echo "phpdock destroying containers"
+    $COMPOSE down --rmi all --volumes --remove-orphans
+
+# If "php" is used, pass-thru to "php"
+# inside a new container
+elif [ "$1" == "php" ]; then
+    shift 1
+    if [ "$EXEC" == "yes" ]; then
+        $COMPOSE exec \
+            -u phpdock \
+            app \
+            php "$@"
+    else
+        $COMPOSE run --rm \
+            app \
+            php "$@"
+    fi
+
+# If "art" is used, pass-thru to "artisan"
+# inside a new container
+elif [ "$1" == "artisan" ] || [ "$1" == "art" ]; then
+    shift 1
+    if [ "$EXEC" == "yes" ]; then
+        $COMPOSE exec \
+            -u phpdock \
+            app \
+            php artisan "$@"
+    else
+        $COMPOSE run --rm \
+            app \
+            php artisan "$@"
+    fi
+
+# If "composer" is used, pass-thru to "composer"
+# inside a new container
+elif [ "$1" == "composer" ] || [ "$1" == "comp" ] || [ "$1" == "com" ]; then
+    shift 1
+    if [ "$EXEC" == "yes" ]; then
+        $COMPOSE exec \
+            -u phpdock \
+            app \
+            composer "$@"
+    else
+        $COMPOSE run --rm \
+            app \
+            composer "$@"
+    fi
+
+# If "test" is used, run unit tests,
+# pass-thru any extra arguments to php-unit
+elif [ "$1" == "test" ]; then
+    shift 1
+    if [ "$EXEC" == "yes" ]; then
+        $COMPOSE exec \
+            -u phpdock \
+            app \
+            ./vendor/bin/phpunit "$@"
+    else
+        $COMPOSE run --rm \
+            app \
+            ./vendor/bin/phpunit "$@"
+    fi
+
+# If "tinker" is used, drop into the REPL
+# inside a new container
+elif [ "$1" == "tinker" ]; then
+    shift 1
+    if [ "$EXEC" == "yes" ]; then
+        $COMPOSE exec \
+            -u phpdock \
+            app \
+            php artisan tinker
+    else
+        $COMPOSE run --rm \
+            app \
+            php artisan tinker
+    fi
+
+# If "node" is used, run node
+# from our node container
+elif [ "$1" == "node" ]; then
+    shift 1
+    $COMPOSE run --rm \
+        web \
+        node "$@"
+
+# If "npm" is used, run npm
+# from our node container
+elif [ "$1" == "npm" ]; then
+    shift 1
+    $COMPOSE run --rm \
+        web \
+        npm "$@"
+
+# If "yarn" is used, run yarn
+# from our node container
+elif [ "$1" == "yarn" ]; then
+    shift 1
+    $COMPOSE run --rm \
+        web \
+        yarn "$@"
+
+    # If "mysql" is used, run mysql
+# from our mysql container
+elif [ "$1" == "mysql" ]; then
+    shift 1
+    if [ "$EXEC" == "yes" ]; then
+        $COMPOSE exec \
+            mysql \
+            /bin/sh -c 'MYSQL_PWD=$MYSQL_ROOT_PASSWORD mysql -u root $MYSQL_DATABASE'
+    else
+        echo "Error: This command can only be run while a MySQL container is running mysqld (mysql server)."
+        echo "This command cannot run the server and the mysql client at the same time."
+    fi
+
+# If "ssh" is used, pass-thru to "ssh"
+# inside a new container
+# e.g.: ./phpdock ssh app
+# e.g.: ./phpdock ssh mysql
+elif [ "$1" == "ssh" ]; then
+    shift 1
+    if [ "$EXEC" == "yes" ] && [ "$1" != "redis" ]; then
+        echo "Logging you in a shell as phpdock user:" && \
+        $COMPOSE exec \
+            -u phpdock \
+            $1 \
+            /bin/sh
+    elif [ "$EXEC" == "yes" ] && [ "$1" == "redis" ]; then
+        $COMPOSE exec \
+            $1 \
+            redis-cli
+    else
+        $COMPOSE run --rm \
+            $1 \
+            /bin/sh
+    fi
+
+    # Else, pass-thru args to docker-compose
+else
+    $COMPOSE "$@"
+fi
