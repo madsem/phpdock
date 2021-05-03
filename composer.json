@@ -1,0 +1,22 @@
+{
+    "name": "madsem/phpdock",
+    "description": "Simple Docker dev environment for PHP based projects",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "madsem",
+            "email": "riepenmarc@gmail.com"
+        }
+    ],
+    "scripts": {
+        "publish": [
+            "bash publish.sh"
+        ],
+        "post-install-cmd": [
+            "@publish"
+        ],
+        "post-update-cmd": [
+            "@publish"
+        ]
+    }
+}
