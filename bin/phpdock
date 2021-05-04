@@ -26,6 +26,8 @@ if [ "$1" == "publish" ]; then
 
     cp -rf $VENDOR_PATH/docker ./docker
 
+    echo "Whenever you're ready, run: phpdock build && phpdock up"
+
 elif [ "$1" == "update" ]; then
 
     $SELF publish
