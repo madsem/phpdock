@@ -2,6 +2,7 @@
 
 SELF=./vendor/bin/phpdock
 VENDOR_PATH=./vendor/madsem/phpdock/src
+TIMESTAMP=date +"%T"
 
 # files to be published to project root
 PHPDOCK_FILES=".env.phpdock docker-compose.yml .dockerignore"
@@ -13,7 +14,7 @@ if [ "$1" == "publish" ]; then
         # Move files to project root,
         # if files or directory exist, rename the old versions.
         if [ -f ./$file ]; then
-            mv ./$file ./$file.bak
+            mv ./$file ./$file.bak.$TIMESTAMP
         fi
 
         cp $VENDOR_PATH/$file ./$file
@@ -21,7 +22,7 @@ if [ "$1" == "publish" ]; then
 
     # Do the same with the docker directory
     if [ -d ./docker ]; then
-        mv ./docker ./docker-bak
+        mv ./docker ./docker-bak-$TIMESTAMP
     fi
 
     cp -rf $VENDOR_PATH/docker ./docker
