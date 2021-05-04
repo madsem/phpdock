@@ -21,7 +21,7 @@ if [ "$1" == "publish" ]; then
 
     # Do the same with the docker directory
     if [ -d ./docker ]; then
-        mv ./docker ./docker.bak
+        mv ./docker ./docker-bak
     fi
 
     cp -rf $VENDOR_PATH/docker ./docker
