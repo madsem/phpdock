@@ -20,42 +20,56 @@ Easily swap out images and configure docker env separate from your application `
 
 # Install
 ```shell
-composer require madsem/phpdock --dev
+composer require-dev madsem/phpdock
 ```
-Then run `vendor/bin/phpdock`, to publish the `docker/` folder and phpdock files into your project directory.
+Then run `vendor/bin/phpdock publish`, to publish the `docker/` folder and phpdock files into your project directory.
 
 Then you can start using the executable shell script like so:
 ```
-./phpdock <command>
+vendor/bin/phpdock <command>
 ```
+
+### Create an Alias
+```shell
+# bash
+alias phpdock="./vendor/bin/phpdock"
  
+ #fish
+ alias phpdock "./vendor/bin/phpdock"
+ ```
+
  ### Start a new Project
  ```shell
- ./phpdock build
+ phpdock build
  ```
  This will build the containers for your project.
 
- After the containers are ready, run `./phpdock up` to start the containers.
+ After the containers are ready, run `phpdock up` to start the containers.
 
  Then you can log into the `app`, `nginx`, `mysql` or `redis` services as follows:
  ```shell
- ./phpdock ssh <service name>
+ phpdock ssh <service name>
  ```
 
-To shut down but not destroy your work, run `./phpdock down`,  
-or to destroy the containers, images and associated volumes `./phpdock destroy`.
+To shut down but not destroy your work, run `phpdock down`,  
+or to destroy the containers, images and associated volumes `phpdock destroy`.
 
-To rebuild containers after config changes, run `./phpdock rebuild`:
+To rebuild containers after config changes, run `phpdock rebuild`:
 ```shell
 # rebuild everything
-./phpdock rebuild
-./phpdock rebuild all
+phpdock rebuild
+phpdock rebuild all
 
 # rebuild only a particular service
-./phpdock rebuild app
+phpdock rebuild app
+phpdock rebuild web
 ```
 
-For more commands, check out the `./phpdock` executable in your project root.
+### Update phpDock
+After composer updating phpDock, you need to run `phpdock update`.
+This will publish the new phpdock files, and append `.bak` to old files & the `docker` directory.
+
+For more commands, check out the `phpdock` executable in your project root.
 
 ## Example For a Laravel Project
 Laravel env file using the phpdock default configuration:
