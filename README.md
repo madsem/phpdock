@@ -34,7 +34,7 @@ vendor/bin/phpdock <command>
 # bash
 alias phpdock="./vendor/bin/phpdock"
  
-#fish
+# fish
 alias phpdock "./vendor/bin/phpdock"
  ```
 
@@ -111,6 +111,7 @@ dom
 fileinfo
 filter
 ftp
+gd
 hash
 iconv
 intl
@@ -130,6 +131,7 @@ redis
 Reflection
 session
 SimpleXML
+soap
 sodium
 SPL
 sqlite3
@@ -148,10 +150,9 @@ This package detects your PHP version and installs the correct version.
 Simply add additional extensions to the `docker/app/Dockerfile`, like this:
 ```shell
 install-php-extensions redis \
-  pdo_mysql \
-  zip \
-  intl \
   bcmath \
+  soap \
+  gd \
   ... \
   ...
 ```

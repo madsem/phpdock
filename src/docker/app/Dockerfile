@@ -22,7 +22,9 @@ RUN chmod +x /usr/local/bin/install-php-extensions && \
   pdo_mysql \
   zip \
   intl \
-  bcmath
+  bcmath \
+  soap \
+  gd
 
 # Remove docker default php-fpm config files
 RUN rm -rf /usr/local/etc/php-fpm.d/*
