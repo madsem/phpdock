@@ -2,7 +2,7 @@
 
 SELF=./vendor/bin/phpdock
 VENDOR_PATH=./vendor/madsem/phpdock/src
-TIMESTAMP=date +"%T"
+TIMESTAMP=`date +%Y-%m-%d_%H-%M-%S`
 
 # files to be published to project root
 PHPDOCK_FILES=".env.phpdock docker-compose.yml .dockerignore"
