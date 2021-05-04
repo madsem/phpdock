@@ -20,11 +20,11 @@ if [ "$1" == "publish" ]; then
     done
 
     # Do the same with the docker directory
-    if [ -d ./test ]; then
-        mv ./test ./test.bak
+    if [ -d ./docker ]; then
+        mv ./docker ./docker.bak
     fi
 
-    cp -rf $VENDOR_PATH/test ./test
+    cp -rf $VENDOR_PATH/docker ./docker
 
 elif [ "$1" == "update" ]; then
 

@@ -34,8 +34,8 @@ vendor/bin/phpdock <command>
 # bash
 alias phpdock="./vendor/bin/phpdock"
  
- #fish
- alias phpdock "./vendor/bin/phpdock"
+#fish
+alias phpdock "./vendor/bin/phpdock"
  ```
 
  ### Start a new Project
