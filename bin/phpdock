@@ -52,7 +52,7 @@ else
 
     if [ "$1" == "build" ]; then
 
-        $COMPOSE build --no-cache --force-rm --parallel
+        $COMPOSE build --no-cache --force-rm
 
     # Start up containers
     elif [ "$1" == "up" ]; then
