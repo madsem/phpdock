@@ -12,7 +12,7 @@ fi
 
 if [ "$1" == "build" ]; then
 
-    $COMPOSE build --no-cache --force-rm
+    $COMPOSE build --no-cache --force-rm --parallel
 
 # Start up containers
 elif [ "$1" == "up" ]; then
@@ -25,10 +25,25 @@ elif [ "$1" == "down" ]; then
     $COMPOSE down --remove-orphans
 
 # Destroy the containers
-elif [ "$1" == "kill" ]; then
+elif [ "$1" == "destroy" ]; then
+    echo "phpdock destroying images & volumes"
     ./phpdock down
-    echo "phpdock destroying containers"
     $COMPOSE down --rmi all --volumes --remove-orphans
+
+# Rebuild one or all containers
+elif [ "$1" == "rebuild" ]; then
+    echo "phpdock rebuilding requested images"
+    ./phpdock down
+    # if no other arguments are set, or is 'all', rebuild everything
+    if [ -z "$2" ] || [ "$2" == 'all' ]; then
+        ./phpdock build
+    else
+        # rebuild only the requested image
+        $COMPOSE build --no-cache --force-rm "$2"
+    fi
+
+    # bring up the new versions
+    ./phpdock up
 
 # If "php" is used, pass-thru to "php"
 # inside a new container

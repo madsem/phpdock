@@ -40,15 +40,17 @@ services:
     volumes:
       - dbdata:/var/lib/mysql
     environment:
-      - MYSQL_DATABASE=${DB_NAME:-phpdock}
-      - MYSQL_USER=${DB_USER:-phpdock}
-      - MYSQL_PASSWORD=${DB_PASS:-secret}
-      - MYSQL_ROOT_PASSWORD=${DB_PASS:-secret}
+      MYSQL_ROOT_PASSWORD: "${DB_PASS:-secret}"
+      MYSQL_DATABASE: "${DB_NAME:-phpdock}"
+      MYSQL_USER: "${DB_USER:-phpdock}"
+      MYSQL_PASSWORD: "${DB_PASS:-secret}"
+      MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
     networks:
       - phpdock
     healthcheck:
-      test: mysqladmin ping -h 127.0.0.1 -u root --password=$$MYSQL_ROOT_PASSWORD
-      interval: 5s
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      timeout: 45s
+      interval: 10s
       retries: 10
 
   mail:

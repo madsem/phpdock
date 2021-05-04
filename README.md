@@ -1,8 +1,7 @@
 # phpDock
 
-Based on Alpine Linux.
-Made for my macOS dev environment.
-Make it your own by forking it, or not and live dangerously! :)
+Based on Alpine Linux.  
+Made for a simple macOS php dev environment.
 
 Including:
 - MySql Server: 5.7, 8.0, latest - [default: 8.0]
@@ -11,18 +10,19 @@ Including:
 - Nginx: 1.20.0-alpine
 - Node: 15.14-alpine
 - MailHog: latest
+- Composer 2
+- node, npm, yarn
 
 # Docker Config
 
-Docker environment can be configured in `./.env.phpdock`
+Docker environment can be configured in `.env.phpdock`.  
 Easily swap out images and configure docker env separate from your application `.env`.
 
 # Install
 ```shell
-# run from your project dir
 composer require madsem/phpdock --dev
 ```
-This will publish the `docker/` folder and phpdock files into your project directory.
+Then run `vendor/bin/phpdock`, to publish the `docker/` folder and phpdock files into your project directory.
 
 Then you can start using the executable shell script like so:
 ```
@@ -42,10 +42,20 @@ Then you can start using the executable shell script like so:
  ./phpdock ssh <service name>
  ```
 
-To shut down but not destroy your work, run `./phpdock down`,
-or to destroy the containers, images and associated volumes `./phpdock kill`.
+To shut down but not destroy your work, run `./phpdock down`,  
+or to destroy the containers, images and associated volumes `./phpdock destroy`.
 
-For more commands, check out the `src/phpdock` executable.
+To rebuild containers after config changes, run `./phpdock rebuild`:
+```shell
+# rebuild everything
+./phpdock rebuild
+./phpdock rebuild all
+
+# rebuild only a particular service
+./phpdock rebuild app
+```
+
+For more commands, check out the `./phpdock` executable in your project root.
 
 ## Example For a Laravel Project
 Laravel env file using the phpdock default configuration:

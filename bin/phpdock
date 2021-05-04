@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+
+PROJECT_PATH='../..'
+
+# files to be published to project root
+PHPDOCK_FILES=".env.phpdock docker-compose.yml phpdock .dockerignore"
+
+for file in $PHPDOCK_FILES; do
+
+    # Move files to project root,
+    # if files or directory exist, rename the old versions.
+    if [ -f $PROJECT_PATH/$file ]; then
+        mv $PROJECT_PATH/$file $PROJECT_PATH/$file.bak
+    fi
+done
+
+# Do the same with the docker directory
+if [ -d $PROJECT_PATH/docker ]; then
+    mv $PROJECT_PATH/docker $PROJECT_PATH/docker-bak
+fi
+
+cp -rf src/docker $PROJECT_PATH/docker
