@@ -66,7 +66,10 @@ phpdock rebuild web
 ```
 
 ### Update phpDock
-After composer updating phpDock, you need to run `phpdock update`.
+```shell
+composer update madsem/phpdock
+phpdock update
+```
 This will publish the new phpdock files, and append `.bak` to old files & the `docker` directory.
 
 For more commands, check out the `phpdock` executable in your project root.
