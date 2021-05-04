@@ -20,7 +20,7 @@ Easily swap out images and configure docker env separate from your application `
 
 # Install
 ```shell
-composer require-dev madsem/phpdock
+composer require madsem/phpdock --dev
 ```
 Then run `vendor/bin/phpdock publish`, to publish the `docker/` folder and phpdock files into your project directory.
 
