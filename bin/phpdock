@@ -13,7 +13,7 @@ if [ "$1" == "publish" ]; then
         # Move files to project root,
         # if files or directory exist, rename the old versions.
         if [ -f ./$file ]; then
-            mv $./$file ./$file.bak
+            mv ./$file ./$file.bak
         fi
 
         cp $VENDOR_PATH/$file ./$file
