@@ -19,7 +19,7 @@ services:
       context: ./docker/app
       dockerfile: Dockerfile
       args:
-        - MY_PHP_VERSION=${ALPINE_PHP_TAG}
+        - MY_PHP_VERSION=${PHP_VERSION}
     volumes:
       - php-sock:/socket
       - ./:/var/www/html
@@ -61,7 +61,7 @@ services:
       - phpdock
 
   redis:
-    image: redis:${ALPINE_REDIS_TAG}
+    image: redis:${REDIS_VERSION}
     command: ["redis-server", "--appendonly", "yes"]
     volumes:
       - redisdata:/data

@@ -1,22 +1,23 @@
 # phpDock
 
 Based on Alpine Linux.  
-Made for a simple macOS php dev environment.
+Made for a simple macOS php development environment.  
 
-Including:
-- MySql Server: 5.7, 8.0, latest - [default: 8.0]
-- PHP-FPM: any valid fpm alpine tag - [default: 8.0.5-fpm-alpine3.13]
-- Redis: any valid alpine tag - [default: 5.0.12-alpine]
-- Nginx: 1.20.0-alpine
-- Node: 15.14-alpine
-- MailHog: latest
-- Composer 2
-- node, npm, yarn
+Including:  
+`PHP-fpm`, `MySql`, `Redis`, `Nginx`, `Mailhog`, `Composer`, `node`, `npm` & `yarn`
+
 
 # Docker Config
 
 Docker environment can be configured in `.env.phpdock`.  
-Easily swap out images and configure docker env separate from your application `.env`.
+Easily swap out images and configure docker separate from your application `.env`.
+
+Use any of these in `.env.phpdock`, to customize your environment:
+- PHP-fpm: 7.4-latest, 8.0-latest
+- MySql Server: any valid mysql tag
+- Redis: any valid alpine tag
+
+To customize more, you can always edit the `docker-compose,yml`.
 
 # Install
 ```shell
@@ -102,6 +103,7 @@ Connect to DB Management software like TablePlus, like this:
 
 # PHP Extensions Installed by Default
 ```shell
+[PHP Modules]
 bcmath
 Core
 ctype
@@ -112,6 +114,7 @@ fileinfo
 filter
 ftp
 gd
+grpc
 hash
 iconv
 intl
@@ -126,6 +129,7 @@ pdo_mysql
 pdo_sqlite
 Phar
 posix
+protobuf
 readline
 redis
 Reflection
@@ -147,9 +151,9 @@ zlib
 ### Install Custom PHP Extensions:
 phpDock uses https://github.com/mlocati/docker-php-extension-installer/ to install extensions.
 This package detects your PHP version and installs the correct version.
-Simply add additional extensions to the `docker/app/Dockerfile`, like this:
+Simply add additional extensions or modifications to the `docker/app/Dockerfile`, like this:
 ```shell
-install-php-extensions redis \
+RUN install-php-extensions redis \
   bcmath \
   soap \
   gd \
