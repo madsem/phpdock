@@ -14,7 +14,7 @@ Easily swap out images and configure docker separate from your application `.env
 
 Use any of these in `.env.phpdock`, to customize your environment:
 - PHP-fpm: 7.4-latest, 8.0-latest
-- MySql Server: any valid mysql tag
+- MySql Server: any valid mysql tag between 5.7 - 8.x
 - Redis: any valid alpine tag
 
 To customize more, you can always edit the `docker-compose,yml`.
@@ -101,7 +101,7 @@ Connect to DB Management software like TablePlus, like this:
 ![table plus config](/docs/tableplus.png)
 
 
-# PHP Extensions Installed by Default
+# phpDock Base Image Extensions Included:
 ```shell
 [PHP Modules]
 bcmath
@@ -149,14 +149,14 @@ zlib
 ```
 
 ### Install Custom PHP Extensions:
-phpDock uses https://github.com/mlocati/docker-php-extension-installer/ to install extensions.
+phpDock uses https://github.com/mlocati/docker-php-extension-installer#supported-php-extensions
+to install extensions.
+
 This package detects your PHP version and installs the correct version.
 Simply add additional extensions or modifications to the `docker/app/Dockerfile`, like this:
 ```shell
-RUN install-php-extensions redis \
-  bcmath \
-  soap \
-  gd \
+RUN install-php-extensions \
+  csv \
   ... \
   ...
 ```
