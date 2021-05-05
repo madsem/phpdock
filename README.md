@@ -1,10 +1,12 @@
 # phpDock
 
-Based on Alpine Linux.  
-Made for a simple macOS php development environment.  
+Docker Compose environment, based on Alpine Linux.  
+
+Made to be a very fast & simple macOS php development environment.  
+Spin up a new environment in `<= 10 seconds`  (after you have the base images downloaded)
 
 Including:  
-`PHP-fpm`, `MySql`, `Redis`, `Nginx`, `Mailhog`, `Composer`, `node`, `npm` & `yarn`
+`php-fpm`, `MySql`, `Redis`, `Nginx`, `Mailhog`, `Composer`, `node`, `npm` & `yarn`
 
 
 # Docker Config
