@@ -75,7 +75,7 @@ phpdock update
 ```
 This will publish the new phpdock files, and append `.bak` to old files & the `docker` directory.
 
-For more commands, check out the `phpdock` executable in your project root.
+For more commands, run `phpdock help`.
 
 ## Example For a Laravel Project
 Laravel env file using the phpdock default configuration:
@@ -112,6 +112,7 @@ ctype
 curl
 date
 dom
+exif
 fileinfo
 filter
 ftp
@@ -119,9 +120,11 @@ gd
 grpc
 hash
 iconv
+imagick
 intl
 json
 libxml
+maxminddb
 mbstring
 mysqlnd
 openssl

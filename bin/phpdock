@@ -1,13 +1,50 @@
 #!/usr/bin/env bash
 
-SELF=./vendor/bin/phpdock
+set -Eeuo pipefail
+
+SCRIPT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" &>/dev/null && pwd -P)
+SELF=$SCRIPT_DIR/phpdock
 VENDOR_PATH=./vendor/madsem/phpdock/src
-TIMESTAMP=`date +%Y-%m-%d_%H-%M-%S`
+TIMESTAMP=$(date +%Y-%m-%d_%H-%M-%S)
 
 # files to be published to project root
 PHPDOCK_FILES=".env.phpdock docker-compose.yml .dockerignore"
 
-if [ "$1" == "publish" ]; then
+if [ "$1" == "help" ]; then
+    cat <<EOF
+Usage: $(basename "${BASH_SOURCE[0]}") [help] arg1 [arg2...]
+
+phpDock development environment
+
+Available options:
+
+help      Print this help and exit
+
+Available commands:
+
+publish:    Moves phpDock files to your project root & makes a backup for existing files.
+update:     Alias for publish
+build:      Builds images
+up:         Starts your containers and creates phpDock network
+down:       Stops services, without destroying data
+destroy:    Removes existing containers, images and volumes.
+rebuild <service>
+    all:            Rebuilds all images
+    <service>:      Rebuilds only this particular service
+php:                Forwards request and arguments to php
+artisan|art:        Forwards request and arguments to Laravel's Artisan
+composer|comp|com:  Forwards request and arguments to composer
+test:               Forwards request and arguments to phpunit
+tinker:             Forwards request and arguments to Laravel's Tinker
+node:               Run Node from inside container
+npm:                Run NPM from inside container
+yarn:               Run Yarn from inside container
+mysql:              Log into Mysql cli as root user
+ssh <service>:      Log into a shell in this service as phpdock user. For Redis log into redis-cli session.
+
+EOF
+
+elif [ "$1" == "publish" ]; then
 
     for file in $PHPDOCK_FILES; do
 
@@ -184,7 +221,7 @@ else
             web \
             yarn "$@"
 
-        # If "mysql" is used, run mysql
+    # If "mysql" is used, run mysql
     # from our mysql container
     elif [ "$1" == "mysql" ]; then
         shift 1

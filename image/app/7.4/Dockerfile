@@ -26,7 +26,10 @@ RUN apk add --update --no-cache git && \
   soap \
   gd \
   grpc \
-  protobuf
+  protobuf \
+  exif \
+  imagick \
+  maxminddb
 
 # Remove docker default php-fpm config files
 RUN rm -rf /usr/local/etc/php-fpm.d/*
