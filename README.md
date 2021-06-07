@@ -117,7 +117,6 @@ fileinfo
 filter
 ftp
 gd
-grpc
 hash
 iconv
 imagick
@@ -134,7 +133,6 @@ pdo_mysql
 pdo_sqlite
 Phar
 posix
-protobuf
 readline
 redis
 Reflection
@@ -162,8 +160,8 @@ Simply add additional extensions or modifications to the `docker/app/Dockerfile`
 ```shell
 RUN install-php-extensions \
   csv \
-  ... \
-  ...
+  grpc \
+  protobuf
 ```
 
 

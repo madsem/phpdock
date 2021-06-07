@@ -25,8 +25,6 @@ RUN apk add --update --no-cache git && \
   bcmath \
   soap \
   gd \
-  grpc \
-  protobuf \
   exif \
   imagick \
   maxminddb
