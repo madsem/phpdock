@@ -70,7 +70,7 @@ phpdock rebuild web
 
 ### Update phpDock
 ```shell
-composer update madsem/phpdock
+composer require madsem/phpdock --dev
 phpdock update
 ```
 This will publish the new phpdock files, and append `.bak` to old files & the `docker` directory.
