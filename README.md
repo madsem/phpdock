@@ -15,7 +15,7 @@ Docker environment can be configured in `.env.phpdock`.
 Easily swap out images and configure docker separate from your application `.env`.
 
 Use any of these in `.env.phpdock`, to customize your environment:
-- PHP-fpm: 7.4-latest, 8.0-latest
+- PHP-fpm: 7.4-latest, 8.0-latest, 8.1-latest
 - MySql Server: any valid mysql tag between 5.7 - 8.x
 - Redis: any valid alpine tag
 
