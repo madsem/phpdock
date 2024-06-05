@@ -1,5 +1,5 @@
-FROM node:15.14-alpine3.11 as node
-FROM --platform=linux/amd64 nginx:1.20.0-alpine
+FROM node:18-alpine as node
+FROM --platform=linux/amd64 nginx:1.27.0-alpine
 
 LABEL maintainer="Klever <riepenmarc@gmail.com>"
 

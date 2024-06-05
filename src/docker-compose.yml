@@ -1,5 +1,6 @@
 services:
   web:
+    platform: linux/amd64
     build:
       context: ./docker/nginx
       dockerfile: Dockerfile
@@ -14,6 +15,7 @@ services:
       - app
 
   app:
+    platform: linux/amd64
     build:
       context: ./docker/app
       dockerfile: Dockerfile
@@ -25,14 +27,20 @@ services:
     networks:
       - phpdock
 
-  singlestoredb:
+  singlestore:
     platform: linux/amd64
-    image: ghcr.io/singlestore-labs/singlestoredb-dev:latest
+    build:
+      context: ./docker/singlestore
+      dockerfile: Dockerfile
     volumes:
-      - "singlestore_data:/data"
+      - singlestore_data:/data
     restart: always
     environment:
-      ROOT_PASSWORD: ${DB_PASS:-secret}
+      ROOT_PASSWORD: ${DB_USER:-root}
+      DB_NAME: ${DB_NAME:-phpdock}
+      DB_USER: ${DB_USER:-root}
+      DB_PASS: ${DB_PASS:-secret}
+    command: ["bash", "-c", "/usr/local/bin/replace_env_vars.sh"]
     ports:
       - 3306:3306
       - 8080:8080
@@ -41,6 +49,7 @@ services:
       - phpdock
 
   mail:
+    platform: linux/amd64
     image: mailhog/mailhog
     ports:
       - 8025:8025
@@ -48,7 +57,8 @@ services:
       - phpdock
 
   redis:
-    image: redis:${REDIS_VERSION}
+    platform: linux/amd64
+    image: redis:latest
     command: ["redis-server", "--appendonly", "yes"]
     volumes:
       - redisdata:/data
