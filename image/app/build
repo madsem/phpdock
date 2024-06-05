@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 
+PLATFORM=linux/amd64
 DOCKER_ACC=madsem
 DOCKER_REPO=phpdock
 TAG_SUFFIX=latest
@@ -11,7 +12,7 @@ for PATH in ./*; do
     TAG=$IMG-$TAG_SUFFIX
     
     # build & tag image
-    $DOCKER build -t $DOCKER_ACC/$DOCKER_REPO:$TAG $IMG
+    $DOCKER build --platform $PLATFORM -t $DOCKER_ACC/$DOCKER_REPO:$TAG $IMG
 
     # push latest version to docker hub
     $DOCKER push $DOCKER_ACC/$DOCKER_REPO:$TAG
