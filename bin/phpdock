@@ -7,15 +7,22 @@ SELF=$SCRIPT_DIR/phpdock
 VENDOR_PATH=./vendor/madsem/phpdock/src
 TIMESTAMP=$(date +%Y-%m-%d_%H-%M-%S)
 
-if [ -f .env.phpdock ]
-then
-    export $(grep -v '^#' .env.phpdock | xargs)
+# Load environment variables from .env.phpdock
+if [ -f .env.phpdock ]; then
+    set -o allexport
+    source .env.phpdock
+    set +o allexport
 fi
 
-# files to be published to project root
+# Debug: Print environment variables
+echo "DB_NAME: $DB_NAME"
+echo "DB_USER: $DB_USER"
+echo "DB_PASS: $DB_PASS"
+
+# Files to be published to project root
 PHPDOCK_FILES=".env.phpdock docker-compose.yml .dockerignore"
 
-if [ "$1" == "help" ]; then
+if [ "${1:-}" == "help" ]; then
     cat <<EOF
 Usage: $(basename "${BASH_SOURCE[0]}") [help] arg1 [arg2...]
 
@@ -45,38 +52,34 @@ node:               Run Node from inside container
 npm:                Run NPM from inside container
 yarn:               Run Yarn from inside container
 mysql:              Log into Mysql cli as root user
+singlestore:        Log into SingleStore cli as root user
 ssh <service>:      Log into a shell in this service as phpdock user. For Redis log into redis-cli session.
 
 EOF
 
-elif [ "$1" == "publish" ]; then
-
+elif [ "${1:-}" == "publish" ]; then
     for file in $PHPDOCK_FILES; do
-
-        # Move files to project root,
-        # if files or directory exist, rename the old versions.
-        if [ -f ./$file ]; then
-            mv ./$file ./$file.bak.$TIMESTAMP
+        # Move files to project root, if files or directory exist, rename the old versions.
+        if [ -f "./$file" ]; then
+            mv "./$file" "./$file.bak.$TIMESTAMP"
         fi
 
-        cp $VENDOR_PATH/$file ./$file
+        cp "$VENDOR_PATH/$file" "./$file"
     done
 
     # Do the same with the docker directory
     if [ -d ./docker ]; then
-        mv ./docker ./docker-bak-$TIMESTAMP
+        mv ./docker "./docker-bak-$TIMESTAMP"
     fi
 
-    cp -rf $VENDOR_PATH/docker ./docker
+    cp -rf "$VENDOR_PATH/docker" ./docker
 
     echo "Whenever you're ready, run: phpdock build && phpdock up"
 
-elif [ "$1" == "update" ]; then
-
+elif [ "${1:-}" == "update" ]; then
     $SELF publish
 
 else
-
     #########################################################################
     #
     #   phpDock commands
@@ -86,38 +89,37 @@ else
 
     # Is the environment running
     PSRESULT="$(docker-compose ps -q)"
-    if [ ! -z "$PSRESULT" ]; then
+    if [ -n "$PSRESULT" ]; then
         EXEC="yes"
     else
         EXEC="no"
     fi
 
-    if [ "$1" == "build" ]; then
-
+    if [ "${1:-}" == "build" ]; then
         $COMPOSE build --no-cache --force-rm
 
     # Start up containers
-    elif [ "$1" == "up" ]; then
+    elif [ "${1:-}" == "up" ]; then
         echo "phpdock starting containers"
-        $COMPOSE up -d
+        $COMPOSE up -d --remove-orphans
 
     # Stop the containers
-    elif [ "$1" == "down" ]; then
+    elif [ "${1:-}" == "down" ]; then
         echo "phpdock stopping containers"
         $COMPOSE down --remove-orphans
 
     # Destroy the containers
-    elif [ "$1" == "destroy" ]; then
+    elif [ "${1:-}" == "destroy" ]; then
         echo "phpdock destroying images & volumes"
         $SELF down
         $COMPOSE down --rmi all --volumes --remove-orphans
 
     # Rebuild one or all containers
-    elif [ "$1" == "rebuild" ]; then
+    elif [ "${1:-}" == "rebuild" ]; then
         echo "phpdock rebuilding requested images"
         $SELF down
         # if no other arguments are set, or is 'all', rebuild everything
-        if [ -z "$2" ] || [ "$2" == 'all' ]; then
+        if [ -z "${2:-}" ] || [ "${2:-}" == 'all' ]; then
             $SELF build
         else
             # rebuild only the requested image
@@ -129,140 +131,103 @@ else
 
     # If "php" is used, pass-thru to "php"
     # inside a new container
-    elif [ "$1" == "php" ]; then
-        shift 1
+    elif [ "${1:-}" == "php" ]; then
+        shift
         if [ "$EXEC" == "yes" ]; then
-            $COMPOSE exec \
-                -u phpdock \
-                app \
-                php "$@"
+            $COMPOSE exec -u phpdock app php "$@"
         else
-            $COMPOSE run --rm \
-                app \
-                php "$@"
+            $COMPOSE run --rm app php "$@"
         fi
 
     # If "art" is used, pass-thru to "artisan"
     # inside a new container
-    elif [ "$1" == "artisan" ] || [ "$1" == "art" ]; then
-        shift 1
+    elif [ "${1:-}" == "artisan" ] || [ "${1:-}" == "art" ]; then
+        shift
         if [ "$EXEC" == "yes" ]; then
-            $COMPOSE exec \
-                -u phpdock \
-                app \
-                php artisan "$@"
+            $COMPOSE exec -u phpdock app php artisan "$@"
         else
-            $COMPOSE run --rm \
-                app \
-                php artisan "$@"
+            $COMPOSE run --rm app php artisan "$@"
         fi
 
     # If "composer" is used, pass-thru to "composer"
     # inside a new container
-    elif [ "$1" == "composer" ] || [ "$1" == "comp" ] || [ "$1" == "com" ]; then
-        shift 1
+    elif [ "${1:-}" == "composer" ] || [ "${1:-}" == "comp" ] || [ "${1:-}" == "com" ]; then
+        shift
         if [ "$EXEC" == "yes" ]; then
-            $COMPOSE exec \
-                -u phpdock \
-                app \
-                composer "$@"
+            $COMPOSE exec -u phpdock app composer "$@"
         else
-            $COMPOSE run --rm \
-                -u phpdock \
-                app \
-                composer "$@"
+            $COMPOSE run --rm -u phpdock app composer "$@"
         fi
 
     # If "test" is used, run unit tests,
     # pass-thru any extra arguments to php-unit
-    elif [ "$1" == "test" ]; then
-        shift 1
-        if [ "$EXEC" == "yes" ]; then
-            $COMPOSE exec \
-                -u phpdock \
-                app \
-                ./vendor/bin/phpunit "$@"
+    elif [ "${1:-}" == "test" ];then
+        shift
+        if [ "$EXEC" == "yes" ];then
+            $COMPOSE exec -u phpdock app ./vendor/bin/phpunit "$@"
         else
-            $COMPOSE run --rm \
-                app \
-                ./vendor/bin/phpunit "$@"
+            $COMPOSE run --rm app ./vendor/bin/phpunit "$@"
         fi
 
     # If "tinker" is used, drop into the REPL
     # inside a new container
-    elif [ "$1" == "tinker" ]; then
-        shift 1
-        if [ "$EXEC" == "yes" ]; then
-            $COMPOSE exec \
-                -u phpdock \
-                app \
-                php artisan tinker
+    elif [ "${1:-}" == "tinker" ];then
+        shift
+        if [ "$EXEC" == "yes" ];then
+            $COMPOSE exec -u phpdock app php artisan tinker
         else
-            $COMPOSE run --rm \
-                app \
-                php artisan tinker
+            $COMPOSE run --rm app php artisan tinker
         fi
 
-    # If "node" is used, run node
-    # from our node container
-    elif [ "$1" == "node" ]; then
-        shift 1
-        $COMPOSE exec \
-            web \
-            node "$@"
+    # If "node" is used, run node from our node container
+    elif [ "${1:-}" == "node" ];then
+        shift
+        $COMPOSE exec web node "$@"
 
-    # If "npm" is used, run npm
-    # from our node container
-    elif [ "$1" == "npm" ]; then
-        shift 1
-        $COMPOSE exec \
-            web \
-            npm "$@"
+    # If "npm" is used, run npm from our node container
+    elif [ "${1:-}" == "npm" ];then
+        shift
+        $COMPOSE exec web npm "$@"
 
-    # If "yarn" is used, run yarn
-    # from our node container
-    elif [ "$1" == "yarn" ]; then
-        shift 1
-        $COMPOSE exec \
-            web \
-            yarn "$@"
+    # If "yarn" is used, run yarn from our node container
+    elif [ "${1:-}" == "yarn" ];then
+        shift
+        $COMPOSE exec web yarn "$@"
 
-    # If "mysql" is used, run mysql
-    # from our mysql container
-    elif [ "$1" == "mysql" ]; then
-        shift 1
-        if [ "$EXEC" == "yes" ]; then
-            $COMPOSE exec \
-                mysql \
-                /bin/sh -c 'MYSQL_PWD=$MYSQL_ROOT_PASSWORD mysql -u root $MYSQL_DATABASE'
+    # If "mysql" is used, run mysql from our mysql container
+    elif [ "${1:-}" == "mysql" ];then
+        shift
+        if [ "$EXEC" == "yes" ];then
+            $COMPOSE exec mysql /bin/sh -c 'MYSQL_PWD=$DB_PASS mysql -u $DB_USER $DB_NAME'
         else
             echo "Error: This command can only be run while a MySQL container is running mysqld (mysql server)."
             echo "This command cannot run the server and the mysql client at the same time."
         fi
 
-    # If "ssh" is used, pass-thru to "ssh"
-    # inside a new container
-    # e.g.: $SELF ssh app
-    # e.g.: $SELF ssh mysql
-    elif [ "$1" == "ssh" ]; then
-        shift 1
-        if [ "$EXEC" == "yes" ] && [ "$1" != "redis" ]; then
-            echo "Logging you in a shell as phpdock user:" &&
-                $COMPOSE exec \
-                    -u phpdock \
-                    $1 \
-                    /bin/sh
-        elif [ "$EXEC" == "yes" ] && [ "$1" == "redis" ]; then
-            $COMPOSE exec \
-                $1 \
-                redis-cli
+    # If "singlestore" is used, run SingleStore from our singlestore container
+    elif [ "${1:-}" == "singlestore" ]; then
+        shift
+        if [ "$EXEC" == "yes" ]; then
+            $COMPOSE exec singlestore /bin/sh -c "MYSQL_PWD=\"$ROOT_PASSWORD\" memsql -u \"$DB_USER\" -D \"$DB_NAME\""
         else
-            $COMPOSE exec \
-                $1 \
-                /bin/sh
+            echo "Error: This command can only be run while a SingleStore container is running."
         fi
 
-        # Else, pass-thru args to docker-compose
+
+
+    # If "ssh" is used, pass-thru to "ssh" inside a new container
+    elif [ "${1:-}" == "ssh" ];then
+        shift
+        if [ "$EXEC" == "yes" ] && [ "$1" != "redis" ];then
+            echo "Logging you in a shell as phpdock user:"
+            $COMPOSE exec -u phpdock "$1" /bin/sh
+        elif [ "$EXEC" == "yes" ] && [ "$1" == "redis" ];then
+            $COMPOSE exec "$1" redis-cli
+        else
+            $COMPOSE exec "$1" /bin/sh
+        fi
+
+    # Else, pass-thru args to docker-compose
     else
         $COMPOSE "$@"
     fi

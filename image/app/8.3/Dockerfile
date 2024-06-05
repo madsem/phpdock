@@ -1,4 +1,4 @@
-FROM php:8.3-fpm-alpine
+FROM --platform=linux/amd64 php:8.3-fpm-alpine
 
 LABEL maintainer="Klever <riepenmarc@gmail.com>"
 
@@ -14,7 +14,10 @@ ENV TZ=UTC \
 
 COPY --from=composer:latest /usr/bin/composer /usr/local/bin/composer
 
-ADD https://github.com/mlocati/docker-php-extension-installer/releases/latest/download/install-php-extensions /usr/local/bin/
+# https://github.com/Imagick/imagick/issues/643
+COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr/local/bin/
+RUN install-php-extensions imagick/imagick@master
+
 RUN apk add --update --no-cache git && \
   chmod +x /usr/local/bin/install-php-extensions && \
   sync && \
@@ -26,7 +29,6 @@ RUN apk add --update --no-cache git && \
   soap \
   gd \
   exif \
-  imagick \
   maxminddb
 
 # Remove docker default php-fpm config files

@@ -23,7 +23,6 @@ Easily swap out images and configure docker separate from your application `.env
 Use any of these in `.env.phpdock`, to customize your environment:
 - PHP-fpm: 8.3-latest
 - MySql Server: any valid mysql tag between 5.7 - 8.x
-- Redis: any valid alpine tag
 - singlestore: always latest version
 
 To customize more, you can always edit the `docker-compose,yml`.
@@ -145,7 +144,7 @@ mysql:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
       timeout: 45s
       interval: 10s
-      retries: 10
+      retries: 5
 ```
 
 # Database Manager
