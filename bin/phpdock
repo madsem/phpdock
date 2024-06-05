@@ -7,6 +7,11 @@ SELF=$SCRIPT_DIR/phpdock
 VENDOR_PATH=./vendor/madsem/phpdock/src
 TIMESTAMP=$(date +%Y-%m-%d_%H-%M-%S)
 
+if [ -f .env.phpdock ]
+then
+    export $(grep -v '^#' .env.phpdock | xargs)
+fi
+
 # files to be published to project root
 PHPDOCK_FILES=".env.phpdock docker-compose.yml .dockerignore"
 
@@ -163,6 +168,7 @@ else
                 composer "$@"
         else
             $COMPOSE run --rm \
+                -u phpdock \
                 app \
                 composer "$@"
         fi

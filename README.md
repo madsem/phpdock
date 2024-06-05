@@ -6,8 +6,14 @@ Made to be a very fast & simple macOS php development environment.
 Spin up a new environment in `<= 10 seconds`  (after you have the base images downloaded)
 
 Including:  
-`php-fpm`, `MySql`, `Redis`, `Nginx`, `Mailhog`, `Composer`, `node`, `npm` & `yarn`
+`php-fpm`, `MySql`,, `Singlestore`, `Redis`, `Nginx`, `Mailhog`, `Composer`, `node`, `npm` & `yarn`
 
+
+# Local Addresses
+- Mailhog:
+  * http://localhost:8025/
+- Singlestore UI:
+  * http://localhost:8080/
 
 # Docker Config
 
@@ -15,9 +21,10 @@ Docker environment can be configured in `.env.phpdock`.
 Easily swap out images and configure docker separate from your application `.env`.
 
 Use any of these in `.env.phpdock`, to customize your environment:
-- PHP-fpm: 7.4-latest, 8.0-latest, 8.1-latest
+- PHP-fpm: 8.3-latest
 - MySql Server: any valid mysql tag between 5.7 - 8.x
 - Redis: any valid alpine tag
+- singlestore: always latest version
 
 To customize more, you can always edit the `docker-compose,yml`.
 
@@ -97,6 +104,49 @@ MAIL_HOST=mail
 MAIL_PORT=1025
 ```
 
+### Config for Mysql:
+```yml
+app:
+    build:
+      context: ./docker/app
+      dockerfile: Dockerfile
+      args:
+        - MY_PHP_VERSION=${PHP_VERSION}
+    volumes:
+      - php-sock:/socket
+      - ./:/var/www/html
+    networks:
+      - phpdock
+    depends_on:
+      mysql:
+        condition: service_healthy
+```
+
+```yml
+mysql:
+    build:
+      context: ./docker/mysql
+      dockerfile: Dockerfile
+      args:
+        - MY_MYSQL_VERSION=${MYSQL_VERSION}
+    ports:
+      - ${DB_PORT:-3306}:3306
+    volumes:
+      - dbdata:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: "${DB_PASS:-secret}"
+      MYSQL_DATABASE: "${DB_NAME:-phpdock}"
+      MYSQL_USER: "${DB_USER:-phpdock}"
+      MYSQL_PASSWORD: "${DB_PASS:-secret}"
+      MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+    networks:
+      - phpdock
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      timeout: 45s
+      interval: 10s
+      retries: 10
+```
 
 # Database Manager
 Connect to DB Management software like TablePlus, like this:  

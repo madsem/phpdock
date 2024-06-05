@@ -1,4 +1,3 @@
-version: "3.8"
 services:
   web:
     build:
@@ -25,33 +24,21 @@ services:
       - ./:/var/www/html
     networks:
       - phpdock
-    depends_on:
-      mysql:
-        condition: service_healthy
 
-  mysql:
-    build:
-      context: ./docker/mysql
-      dockerfile: Dockerfile
-      args:
-        - MY_MYSQL_VERSION=${MYSQL_VERSION}
-    ports:
-      - ${DB_PORT:-3306}:3306
+  singlestoredb:
+    platform: linux/amd64
+    image: ghcr.io/singlestore-labs/singlestoredb-dev:latest
     volumes:
-      - dbdata:/var/lib/mysql
+      - "singlestore_data:/data"
+    restart: always
     environment:
-      MYSQL_ROOT_PASSWORD: "${DB_PASS:-secret}"
-      MYSQL_DATABASE: "${DB_NAME:-phpdock}"
-      MYSQL_USER: "${DB_USER:-phpdock}"
-      MYSQL_PASSWORD: "${DB_PASS:-secret}"
-      MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+      ROOT_PASSWORD: ${DB_PASS:-secret}
+    ports:
+      - 3306:3306
+      - 8080:8080
+      - 9000:9000
     networks:
       - phpdock
-    healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
-      timeout: 45s
-      interval: 10s
-      retries: 10
 
   mail:
     image: mailhog/mailhog
@@ -70,7 +57,7 @@ services:
 
 volumes:
   php-sock:
-  dbdata:
+  singlestore_data:
   redisdata:
 
 networks:

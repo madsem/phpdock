@@ -1,5 +1,5 @@
 ARG MY_MYSQL_VERSION
-FROM mysql:${MY_MYSQL_VERSION}
+FROM --platform=linux/amd64 mysql:${MY_MYSQL_VERSION}
 
 LABEL maintainer="Klever <riepenmarc@gmail.com>"
 
