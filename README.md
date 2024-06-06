@@ -9,6 +9,8 @@ Including:
 `php-fpm`, `MySql`,, `Singlestore`, `Redis`, `Nginx`, `Mailhog`, `Composer`, `node`, `npm` & `yarn`
 
 
+Deafults to Singlestore DB.
+
 # Local Addresses
 - Mailhog:
   * http://localhost:8025/
@@ -24,6 +26,7 @@ Use any of these in `.env.phpdock`, to customize your environment:
 - PHP-fpm: 8.3-latest
 - MySql Server: any valid mysql tag between 5.7 - 8.x
 - singlestore: always latest version
+- redis: always latest version
 
 To customize more, you can always edit the `docker-compose,yml`.
 

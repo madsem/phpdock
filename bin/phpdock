@@ -14,11 +14,6 @@ if [ -f .env.phpdock ]; then
     set +o allexport
 fi
 
-# Debug: Print environment variables
-echo "DB_NAME: $DB_NAME"
-echo "DB_USER: $DB_USER"
-echo "DB_PASS: $DB_PASS"
-
 # Files to be published to project root
 PHPDOCK_FILES=".env.phpdock docker-compose.yml .dockerignore"
 
@@ -151,9 +146,9 @@ else
 
     # If "composer" is used, pass-thru to "composer"
     # inside a new container
-    elif [ "${1:-}" == "composer" ] || [ "${1:-}" == "comp" ] || [ "${1:-}" == "com" ]; then
+    elif [ "${1:-}" == "composer" ] || [ "${1:-}" == "comp" ] || [ "${1:-}" == "com" ];then
         shift
-        if [ "$EXEC" == "yes" ]; then
+        if [ "$EXEC" == "yes" ];then
             $COMPOSE exec -u phpdock app composer "$@"
         else
             $COMPOSE run --rm -u phpdock app composer "$@"
@@ -198,7 +193,7 @@ else
     elif [ "${1:-}" == "mysql" ];then
         shift
         if [ "$EXEC" == "yes" ];then
-            $COMPOSE exec mysql /bin/sh -c 'MYSQL_PWD=$DB_PASS mysql -u $DB_USER $DB_NAME'
+            $COMPOSE exec mysql /bin/sh -c "MYSQL_PWD=\"$DB_PASS\" mysql -u \"$DB_USER\" -D \"$DB_NAME\""
         else
             echo "Error: This command can only be run while a MySQL container is running mysqld (mysql server)."
             echo "This command cannot run the server and the mysql client at the same time."
@@ -208,28 +203,33 @@ else
     elif [ "${1:-}" == "singlestore" ]; then
         shift
         if [ "$EXEC" == "yes" ]; then
-            $COMPOSE exec singlestore /bin/sh -c "MYSQL_PWD=\"$ROOT_PASSWORD\" memsql -u \"$DB_USER\" -D \"$DB_NAME\""
+            $COMPOSE exec singlestore /bin/sh -c "MYSQL_PWD=\"$DB_PASS\" memsql -u \"$DB_USER\" -D \"$DB_NAME\""
         else
             echo "Error: This command can only be run while a SingleStore container is running."
         fi
 
+    # If "ssh" is used, log into this service as phpdock user
+    elif [ "${1:-}" == "ssh" ]; then
+        SERVICE="${2:-}"
+        if [ -z "$SERVICE" ]; then
+            echo "Error: No service specified. Usage: phpdock ssh <service>"
+            exit 1
+        fi
 
-
-    # If "ssh" is used, pass-thru to "ssh" inside a new container
-    elif [ "${1:-}" == "ssh" ];then
-        shift
-        if [ "$EXEC" == "yes" ] && [ "$1" != "redis" ];then
-            echo "Logging you in a shell as phpdock user:"
-            $COMPOSE exec -u phpdock "$1" /bin/sh
-        elif [ "$EXEC" == "yes" ] && [ "$1" == "redis" ];then
-            $COMPOSE exec "$1" redis-cli
+        if [ "$EXEC" == "yes" ]; then
+            if [ "$SERVICE" == "redis" ]; then
+                $COMPOSE exec "$SERVICE" redis-cli
+            else
+                echo "Log into a shell as phpdock user:"
+                $COMPOSE exec -u phpdock "$SERVICE" /bin/sh
+            fi
         else
-            $COMPOSE exec "$1" /bin/sh
+            echo "Error: The specified service is not running."
+            exit 1
         fi
 
     # Else, pass-thru args to docker-compose
     else
         $COMPOSE "$@"
     fi
-
 fi

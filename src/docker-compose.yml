@@ -48,7 +48,6 @@ services:
         ROOT_PASSWORD: ${DB_PASS:-secret}
         DB_NAME: ${DB_NAME:-phpdock}
         DB_USER: ${DB_USER:-phpdock}
-        DB_PASS: ${DB_PASS:-secret}
     depends_on:
       singlestore:
           condition: service_healthy
