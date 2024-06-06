@@ -29,22 +29,32 @@ services:
 
   singlestore:
     platform: linux/amd64
-    build:
-      context: ./docker/singlestore
-      dockerfile: Dockerfile
+    image: ghcr.io/singlestore-labs/singlestoredb-dev:latest
     volumes:
       - singlestore_data:/data
     restart: always
     environment:
-      ROOT_PASSWORD: ${DB_USER:-root}
-      DB_NAME: ${DB_NAME:-phpdock}
-      DB_USER: ${DB_USER:-root}
-      DB_PASS: ${DB_PASS:-secret}
-    command: ["bash", "-c", "/usr/local/bin/replace_env_vars.sh"]
+      ROOT_PASSWORD: ${DB_PASS:-secret}
     ports:
       - 3306:3306
       - 8080:8080
       - 9000:9000
+    networks:
+      - phpdock
+
+  singlestore_init:
+    image: curlimages/curl
+    environment:
+        ROOT_PASSWORD: ${DB_PASS:-secret}
+        DB_NAME: ${DB_NAME:-phpdock}
+        DB_USER: ${DB_USER:-phpdock}
+        DB_PASS: ${DB_PASS:-secret}
+    depends_on:
+      singlestore:
+          condition: service_healthy
+    volumes:
+      - ./docker/singlestore/:/docker-entrypoint-initdb.d
+    entrypoint: /docker-entrypoint-initdb.d/docker-entrypoint.sh
     networks:
       - phpdock
 
