@@ -4,7 +4,7 @@ set -e
 set -u
 set -o pipefail
 
-url="root:${ROOT_PASSWORD}@singlestore:9000/api/v1/query/rows"
+url="root:${DB_PASS}@singlestore:9000/api/v1/query/rows"
 header="content-type: application/json"
 
 
